@@ -1,2 +1,5 @@
 # Worky 
 ## Plataforma de oficios
+El problema detectado fue que los trabajadores informales o matriculados que ejercen oficios tecnicos tales como albañileria, electricista, plomeria, gasistas, etc. No tienen acceso a ninguna plataforma donde puedan ser contratados por personas o empresas. Y que  personas o las empresas, como una construrctora, no tienen tampoco una plataforma donde puedan encontrar gente que ejerce tales oficios, las cuales escasean en los ultimos tiempos.
+Nuestra solucion desde Worky es crear una plataforma donde tanto empleadores o personas que lo necesiten, asi como tecnicos prestadores de servicios convivan en una aplicacion donde entre ellos puedan cumplir sus necesidades, satisfaciendo las necesidades de la gente o empresas(servicios) y la de los profesionales(trabajo).
+Nuestro publico objetivo son las empresas a las cuales les podriamos brindar el acceso a una aplicacion con una amplia base de datos, con prestadores de servicios. Para que de esta forma, les sea mas facil encontrar y posteriormente contratar gente que supla esa necesidad.
