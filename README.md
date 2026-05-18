@@ -18,3 +18,23 @@ En tests se guardan pruebas unitarias y de integración
 # README.md
 readme es la guía principal, aquí se guarda todo acerca del proyecto
 ## Integrantes y Roles
+
+## Hardware
+En hardware, vamos a necesitar dispositivos móviles que permitan el acceso a la aplicación. Estará optimizada para funcionar con los sistemas operativos más básicos.
+También, servidores de hosting(nube), que es donde se almacenará toda nuestra base de datos.
+## Software
+Con respecto al software, la estructura sería la siguiente
+Lenguajes y Frameworks
+# Frontend
+React Native. Fundamental para que la app funciones tanto en android como en IOS con solo un código
+# Backend: 
+Con el Node.js con el Framework Express. Es el motor que gestionará las solicitudes, los pagos y perfiles.
+# Base de datos
+MongoDB: Al ser NoSQL, nos permite manejar perfiles de usuarios que pueden variar.
+# APIs
+Google Maps: Geolocalización de oportunidades de trabajo y trabajadores.
+Mercado Pago: Procesa pagos de forma segura dentro de la app.
+Firebase Cloud Messaging: Para enviar notificaciones push, cuando alguien solicita un servicio.
+# Roles
+Scrum Master: Mateo Villarreal
+Desarrollador: Santiago Romero
