@@ -1,0 +1,2 @@
+1. Búsqueda de información respecto a React para el desarrollo de la aplicación, backend y fontend.
+2. Buscamos definir un Sistema para la base de datos
