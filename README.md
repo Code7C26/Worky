@@ -5,3 +5,36 @@ El problema detectado fue que los prestadores de servicios que ejercen oficios t
 Nuestra solucion desde Worky es ces una plataforma integral de vinculación laboral diseñada para centralizar la oferta y demanda de servicios técnicos. Nuestro sistema permite que los profesionales publiquen su experiencia y certificaciones, mientras que los empleadores acceden a una base de datos optimizada con filtros de especialidad y ubicación, garantizando eficiencia en la contratación y seguridad para ambas partes.
 
 Nuestro publico objetivo son las empresas que precisen agilizar los procesos de reclutamiento de personal técnico para obras o mantenimientos a gran escala. Los usuarios particulares que requieran soluciones rapidas para mantenimientos y reparaciones domésticas y los Profesionales de oficios, que busquen ampliar su cartera de clientes y tener una presencia digital.
+
+## Estructura del repositorio
+# assets
+En esta carpeta se guardan Logotipos, imágenes y recursos visuales.
+# src
+Aquí se guarda el código fuente de la aplicación, tanto Frontend como Backend.
+# docs
+En docs se guarda la documentación técnica de la aplicación, los manuales del usuario y diagramas.
+# tests
+En tests se guardan pruebas unitarias y de integración
+# README.md
+readme es la guía principal, aquí se guarda todo acerca del proyecto
+## Integrantes y Roles
+
+## Hardware
+En hardware, vamos a necesitar dispositivos móviles que permitan el acceso a la aplicación. Estará optimizada para funcionar con los sistemas operativos más básicos.
+También, servidores de hosting(nube), que es donde se almacenará toda nuestra base de datos.
+## Software
+Con respecto al software, la estructura sería la siguiente
+Lenguajes y Frameworks
+# Frontend
+React Native. Fundamental para que la app funciones tanto en android como en IOS con solo un código
+# Backend: 
+Con el Node.js con el Framework Express. Es el motor que gestionará las solicitudes, los pagos y perfiles.
+# Base de datos
+MongoDB: Al ser NoSQL, nos permite manejar perfiles de usuarios que pueden variar.
+# APIs
+Google Maps: Geolocalización de oportunidades de trabajo y trabajadores.
+Mercado Pago: Procesa pagos de forma segura dentro de la app.
+Firebase Cloud Messaging: Para enviar notificaciones push, cuando alguien solicita un servicio.
+# Roles
+Scrum Master: Mateo Villarreal
+Desarrollador: Santiago Romero
