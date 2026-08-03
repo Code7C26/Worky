@@ -1,0 +1,13 @@
+Material a presentar el Lunes 3 de Agosto
+Cada grupo deberá presentar:
+1. Documento con la revisión post-pasantía y estado actual del proyecto.
+- }
+2. Captura del tablero actualizado (GitHub Project).
+- 
+3. Lista de tareas próximas a trabajar (mínimo tres).
+- Estructura de la interfaz.
+- Marketing en todo su esplendor
+- Compatibilidades de la APP.
+4. Descripción de al menos una mejora al producto.
+- Como la gente que usará esta aplicación es más bien gente mayor, se nos ocurrió activar un modo oscuro para que la visualización de la aplicación sea mucho más ameno y cómoda
+5. (Opcional) Prototipo modificado, diseño actualizado

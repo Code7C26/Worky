@@ -1,0 +1,92 @@
+import React from 'react';
+import { View, Text, StyleSheet, SafeAreaView, Pressable } from 'react-native';
+import { colors, fonts, radius } from '../theme/theme';
+import { professionals } from '../data/mockData';
+
+export default function ConfirmationScreen({ route, navigation }) {
+  const { proId } = route.params;
+  const pro = professionals.find((p) => p.id === proId) ?? professionals[0];
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.wrap}>
+        <View style={styles.checkCircle}>
+          <Text style={styles.checkMark}>✓</Text>
+        </View>
+        <Text style={styles.title}>Changa publicada</Text>
+        <Text style={styles.subtitle}>
+          Le avisamos a {pro.name.split(' ')[0]} y a otros profesionales cercanos. Te vamos a
+          notificar apenas alguien confirme.
+        </Text>
+
+        <TrackRow title="Publicada" subtitle="Hoy, 10:42" />
+        <TrackRow
+          title="Esperando confirmación"
+          subtitle={`${pro.name} está viendo tu pedido`}
+        />
+
+        <Pressable
+          style={styles.chatLink}
+          onPress={() => navigation.navigate('Chat', { proId: pro.id })}
+        >
+          <Text style={styles.chatLinkText}>💬 Escribirle a {pro.name.split(' ')[0]}</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function TrackRow({ title, subtitle }) {
+  return (
+    <View style={styles.trackRow}>
+      <Text style={styles.trackTitle}>{title}</Text>
+      <Text style={styles.trackSubtitle}>{subtitle}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: colors.bg },
+  wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
+  checkCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.successBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  checkMark: { color: colors.success, fontSize: 28, fontWeight: '700' },
+  title: { fontFamily: fonts.displaySemi, fontSize: 19, color: colors.navyDeep, marginBottom: 8 },
+  subtitle: {
+    fontFamily: fonts.body,
+    fontSize: 12.5,
+    color: colors.inkSoft,
+    lineHeight: 20,
+    textAlign: 'center',
+    marginBottom: 26,
+  },
+  trackRow: {
+    width: '100%',
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: radius.lg,
+    padding: 16,
+    marginBottom: 12,
+  },
+  trackTitle: { fontFamily: fonts.bodySemi, fontSize: 12, color: colors.navyDeep },
+  trackSubtitle: { fontFamily: fonts.body, fontSize: 11, color: colors.inkFaint, marginTop: 2 },
+  chatLink: {
+    width: '100%',
+    paddingVertical: 14,
+    borderRadius: radius.lg,
+    borderWidth: 1.5,
+    borderColor: colors.orange,
+    backgroundColor: colors.orangeBg,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  chatLinkText: { fontFamily: fonts.displaySemi, fontSize: 13, color: colors.orange },
+});

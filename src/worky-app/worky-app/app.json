@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Worky",
+    "slug": "worky-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#0B1B2E"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.worky.app"
+    },
+    "android": {
+      "package": "com.worky.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0B1B2E"
+      }
+    }
+  }
+}
