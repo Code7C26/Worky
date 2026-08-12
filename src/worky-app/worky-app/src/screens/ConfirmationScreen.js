@@ -9,6 +9,13 @@ export default function ConfirmationScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <Pressable
+        style={styles.closeBtn}
+        onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Home' }] })}
+        hitSlop={10}
+      >
+        <Text style={styles.closeText}>✕</Text>
+      </Pressable>
       <View style={styles.wrap}>
         <View style={styles.checkCircle}>
           <Text style={styles.checkMark}>✓</Text>
@@ -47,6 +54,8 @@ function TrackRow({ title, subtitle }) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
+  closeBtn: { position: 'absolute', top: 16, right: 20, zIndex: 10, padding: 6 },
+  closeText: { fontFamily: fonts.bodySemi, fontSize: 20, color: colors.inkFaint },
   wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
   checkCircle: {
     width: 64,

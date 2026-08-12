@@ -6,15 +6,24 @@ import {
   SafeAreaView,
   ScrollView,
   TextInput,
+  Pressable,
 } from 'react-native';
 import { colors, fonts } from '../theme/theme';
 import CategoryChip from '../components/CategoryChip';
 import ProCard from '../components/ProCard';
 import { categories, professionals } from '../data/mockData';
+import { useAuth } from '../context/AuthContext';
 
 export default function HomeScreen({ navigation }) {
+  const { usuario, logout } = useAuth();
+  const primerNombre = usuario?.nombre?.split(' ')[0] || 'Vecino/a';
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [query, setQuery] = useState('');
+
+  const handleLogout = async () => {
+    await logout();
+    navigation.reset({ index: 0, routes: [{ name: 'Splash' }] });
+  };
 
   const filtered = useMemo(() => {
     return professionals.filter((p) => {
@@ -31,8 +40,15 @@ export default function HomeScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <Text style={styles.greet}>Hola,</Text>
-        <Text style={styles.name}>Marcela</Text>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.greet}>Hola,</Text>
+            <Text style={styles.name}>{primerNombre}</Text>
+          </View>
+          <Pressable onPress={handleLogout} hitSlop={10}>
+            <Text style={styles.logout}>Salir</Text>
+          </Pressable>
+        </View>
         <View style={styles.searchBar}>
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
@@ -88,6 +104,8 @@ const styles = StyleSheet.create({
   },
   greet: { fontFamily: fonts.body, color: colors.inkOnNavyFaint, fontSize: 12 },
   name: { fontFamily: fonts.display, color: '#fff', fontSize: 18 },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  logout: { fontFamily: fonts.bodySemi, color: colors.inkOnNavyFaint, fontSize: 12, marginTop: 2 },
   searchBar: {
     marginTop: 16,
     backgroundColor: colors.navySoft,

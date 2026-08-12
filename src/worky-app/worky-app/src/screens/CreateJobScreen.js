@@ -39,6 +39,9 @@ export default function CreateJobScreen({ route, navigation }) {
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.header}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <Text style={styles.back}>← Volver</Text>
+          </Pressable>
           <Text style={styles.title}>Solicitar changa</Text>
           <Text style={styles.subtitle}>
             Completá los datos para que {pro.name.split(' ')[0]} reciba tu pedido
@@ -119,6 +122,7 @@ function Field({ label, required, children }) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   header: { padding: 20 },
+  back: { fontFamily: fonts.body, fontSize: 13, color: colors.inkSoft, marginBottom: 14 },
   title: { fontFamily: fonts.displaySemi, fontSize: 18, color: colors.navyDeep },
   subtitle: { fontFamily: fonts.body, fontSize: 12, color: colors.inkSoft, marginTop: 4 },
   body: { paddingHorizontal: 20 },

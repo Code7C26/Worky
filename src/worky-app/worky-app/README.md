@@ -4,12 +4,24 @@ Prototipo navegable de la app cliente de Worky, hecho con **Expo** (React Native
 
 ## Pantallas incluidas
 
-1. **Splash** — bienvenida y entrada al flujo.
-2. **Home** — búsqueda y filtro de profesionales por categoría.
-3. **Profile** — perfil del profesional (rating, experiencia, precio de referencia).
-4. **CreateJob** — formulario para solicitar una changa (ubicación, categoría y precio ofrecido son obligatorios, igual que en el endpoint `POST /api/v1/trabajos`).
-5. **Confirmation** — estado de la changa publicada.
-6. **Chat** — mensajería con el profesional, ligada a la changa. Ya tiene envío de mensajes funcional en memoria; falta conectarla a un backend real.
+1. **Splash** — bienvenida. Los dos botones ahora llevan a Login, marcando si venís como cliente o profesional.
+2. **Login** — inicio de sesión real contra el backend. Link abajo a "Crear cuenta".
+3. **Register** — alta de cuenta real contra el backend. Guarda la sesión automáticamente al crearla.
+4. **Home** — búsqueda y filtro de profesionales por categoría (todavía con datos de ejemplo, ver sección "Próximos pasos").
+5. **Profile** — perfil del profesional (rating, experiencia, precio de referencia).
+6. **CreateJob** — formulario para solicitar una changa (ubicación, categoría y precio ofrecido son obligatorios, igual que en el endpoint `POST /api/v1/trabajos`).
+7. **Confirmation** — estado de la changa publicada.
+8. **Chat** — mensajería con el profesional, ligada a la changa.
+
+## ⚠️ Importante: conectar con el backend desde el celular
+
+En `src/api/client.js` hay una constante `API_BASE_URL` apuntando a `http://localhost:4000`. Esto funciona si probás con `npx expo start --web` en la misma computadora donde corre el backend. **Pero si abrís la app en tu celular con Expo Go, `localhost` ahí apunta al celular, no a tu PC**, y el login/registro van a fallar con error de conexión.
+
+Solución: conseguí la IP de tu compu en la red local (`ipconfig` en PowerShell → "Dirección IPv4", algo como `192.168.0.15`), y reemplazá esa línea en `client.js` por:
+```js
+const API_BASE_URL = 'http://192.168.0.15:4000/api/v1';
+```
+Tu celular y tu compu tienen que estar en la **misma red Wi-Fi** para que esto funcione.
 
 ## Cómo correrlo
 

@@ -38,12 +38,12 @@ export default function SplashScreen({ navigation }) {
 
         <GradientButton
           label="Buscar un profesional"
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => navigation.navigate('Login', { rol: 'cliente' })}
           style={{ width: '100%', marginBottom: 12 }}
         />
         <GhostButton
           label="Soy profesional de oficio"
-          onPress={() => {}}
+          onPress={() => navigation.navigate('Login', { rol: 'profesional' })}
           style={{ width: '100%' }}
         />
       </View>
