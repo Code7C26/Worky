@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Worky",
-    "slug": "worky-app",
+    "slug": "worky",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -17,6 +17,12 @@
       "adaptiveIcon": {
         "backgroundColor": "#0B1B2E"
       }
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6c9004fc-e118-4cba-a971-d89c29ebfb79"
+      }
+    },
+    "owner": "worky-team"
   }
 }
