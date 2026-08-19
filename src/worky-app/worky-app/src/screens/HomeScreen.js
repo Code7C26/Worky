@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,44 @@ import {
   ScrollView,
   TextInput,
   Pressable,
+  ActivityIndicator,
 } from 'react-native';
 import { colors, fonts } from '../theme/theme';
 import CategoryChip from '../components/CategoryChip';
 import ProCard from '../components/ProCard';
-import { categories, professionals } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../api/client';
+import { mapPerfilAPro } from '../utils/mappers';
+
+const CATEGORIES = ['Todos', 'Plomería', 'Electricidad', 'Gas', 'Albañilería'];
 
 export default function HomeScreen({ navigation }) {
   const { usuario, logout } = useAuth();
   const primerNombre = usuario?.nombre?.split(' ')[0] || 'Vecino/a';
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [query, setQuery] = useState('');
+  const [profesionales, setProfesionales] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+
+  const cargarProfesionales = async () => {
+    setCargando(true);
+    setError('');
+    try {
+      const data = await api.getProfesionales(
+        activeCategory !== 'Todos' ? { categoria: activeCategory } : {}
+      );
+      setProfesionales(data.map(mapPerfilAPro));
+    } catch (e) {
+      setError(e.message || 'No pudimos cargar los profesionales.');
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarProfesionales();
+  }, [activeCategory]);
 
   const handleLogout = async () => {
     await logout();
@@ -26,16 +52,12 @@ export default function HomeScreen({ navigation }) {
   };
 
   const filtered = useMemo(() => {
-    return professionals.filter((p) => {
-      const matchesCategory =
-        activeCategory === 'Todos' || p.oficio.toLowerCase().includes(activeCategory.toLowerCase());
-      const matchesQuery =
-        query.trim() === '' ||
-        p.name.toLowerCase().includes(query.toLowerCase()) ||
-        p.oficio.toLowerCase().includes(query.toLowerCase());
-      return matchesCategory && matchesQuery;
-    });
-  }, [activeCategory, query]);
+    if (!query.trim()) return profesionales;
+    const q = query.toLowerCase();
+    return profesionales.filter(
+      (p) => p.name.toLowerCase().includes(q) || p.oficio.toLowerCase().includes(q)
+    );
+  }, [profesionales, query]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -66,7 +88,7 @@ export default function HomeScreen({ navigation }) {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.chips}
       >
-        {categories.map((cat) => (
+        {CATEGORIES.map((cat) => (
           <CategoryChip
             key={cat}
             label={cat}
@@ -76,18 +98,35 @@ export default function HomeScreen({ navigation }) {
         ))}
       </ScrollView>
 
-      <Text style={styles.sectionTitle}>Cerca de tu ubicación</Text>
+      <Text style={styles.sectionTitle}>Profesionales disponibles</Text>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
-        {filtered.map((pro) => (
-          <ProCard
-            key={pro.id}
-            pro={pro}
-            onPress={() => navigation.navigate('Profile', { proId: pro.id })}
-          />
-        ))}
-        {filtered.length === 0 && (
-          <Text style={styles.empty}>No encontramos profesionales para esa búsqueda.</Text>
+        {cargando && <ActivityIndicator color={colors.orange} style={{ marginTop: 20 }} />}
+
+        {!cargando && !!error && (
+          <View style={{ paddingHorizontal: 20 }}>
+            <Text style={styles.error}>{error}</Text>
+            <Pressable onPress={cargarProfesionales}>
+              <Text style={styles.retry}>Reintentar</Text>
+            </Pressable>
+          </View>
+        )}
+
+        {!cargando &&
+          !error &&
+          filtered.map((pro) => (
+            <ProCard
+              key={pro.id}
+              pro={pro}
+              onPress={() => navigation.navigate('Profile', { proId: pro.id })}
+            />
+          ))}
+
+        {!cargando && !error && filtered.length === 0 && (
+          <Text style={styles.empty}>
+            Todavía no hay profesionales cargados para esta categoría. Cuando alguien complete su
+            perfil, va a aparecer acá.
+          </Text>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -138,5 +177,9 @@ const styles = StyleSheet.create({
     color: colors.inkFaint,
     textAlign: 'center',
     marginTop: 20,
+    paddingHorizontal: 20,
+    lineHeight: 19,
   },
+  error: { fontFamily: fonts.body, fontSize: 13, color: '#C0392B', marginTop: 16 },
+  retry: { fontFamily: fonts.bodySemi, fontSize: 13, color: colors.orange, marginTop: 8 },
 });

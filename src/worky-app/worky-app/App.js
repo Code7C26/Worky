@@ -12,6 +12,9 @@ import SplashScreen from './src/screens/SplashScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import ProfessionalHomeScreen from './src/screens/ProfessionalHomeScreen';
+import ProfessionalProfileEditScreen from './src/screens/ProfessionalProfileEditScreen';
+import ProfessionalJobsScreen from './src/screens/ProfessionalJobsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import CreateJobScreen from './src/screens/CreateJobScreen';
 import ConfirmationScreen from './src/screens/ConfirmationScreen';
@@ -52,6 +55,9 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="ProfessionalHome" component={ProfessionalHomeScreen} />
+          <Stack.Screen name="ProfessionalProfileEdit" component={ProfessionalProfileEditScreen} />
+          <Stack.Screen name="ProfessionalJobs" component={ProfessionalJobsScreen} />
           <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="CreateJob" component={CreateJobScreen} />
           <Stack.Screen name="Confirmation" component={ConfirmationScreen} />

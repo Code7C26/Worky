@@ -1,13 +1,48 @@
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { colors, fonts, radius } from '../theme/theme';
 import Avatar from '../components/Avatar';
 import GradientButton from '../components/GradientButton';
-import { professionals } from '../data/mockData';
+import { api } from '../api/client';
+import { mapPerfilAPro } from '../utils/mappers';
 
 export default function ProfileScreen({ route, navigation }) {
   const { proId } = route.params;
-  const pro = professionals.find((p) => p.id === proId) ?? professionals[0];
+  const [pro, setPro] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const perfil = await api.getProfesional(proId);
+        setPro(mapPerfilAPro(perfil));
+      } catch (e) {
+        setError(e.message || 'No pudimos cargar este perfil.');
+      } finally {
+        setCargando(false);
+      }
+    })();
+  }, [proId]);
+
+  if (cargando) {
+    return (
+      <SafeAreaView style={[styles.safe, styles.centered]}>
+        <ActivityIndicator color={colors.orange} />
+      </SafeAreaView>
+    );
+  }
+
+  if (error || !pro) {
+    return (
+      <SafeAreaView style={[styles.safe, styles.centered]}>
+        <Text style={styles.errorText}>{error || 'No encontramos este perfil.'}</Text>
+        <Pressable onPress={() => navigation.goBack()}>
+          <Text style={styles.backLink}>← Volver</Text>
+        </Pressable>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -57,7 +92,13 @@ export default function ProfileScreen({ route, navigation }) {
       <View style={styles.cta}>
         <GradientButton
           label="Solicitar changa"
-          onPress={() => navigation.navigate('CreateJob', { proId: pro.id })}
+          onPress={() =>
+            navigation.navigate('CreateJob', {
+              proId: pro.id,
+              proNombre: pro.name,
+              proCategoria: pro.categoria,
+            })
+          }
         />
       </View>
     </SafeAreaView>
@@ -75,6 +116,9 @@ function Stat({ n, l }) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
+  centered: { alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24 },
+  errorText: { fontFamily: fonts.body, fontSize: 13, color: '#C0392B', textAlign: 'center' },
+  backLink: { fontFamily: fonts.bodySemi, fontSize: 13, color: colors.orange },
   hero: { backgroundColor: colors.navyDeep, padding: 20 },
   back: { fontFamily: fonts.body, fontSize: 13, color: colors.inkOnNavyFaint, marginBottom: 18 },
   topRow: { flexDirection: 'row', gap: 14, alignItems: 'center' },

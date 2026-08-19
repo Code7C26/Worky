@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Pressable } from 'react-native';
 import { colors, fonts, radius } from '../theme/theme';
-import { professionals } from '../data/mockData';
 
 export default function ConfirmationScreen({ route, navigation }) {
-  const { proId } = route.params;
-  const pro = professionals.find((p) => p.id === proId) ?? professionals[0];
+  const { proId, proNombre, changaId } = route.params;
+  const primerNombre = proNombre?.split(' ')[0] || 'el profesional';
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -22,21 +21,21 @@ export default function ConfirmationScreen({ route, navigation }) {
         </View>
         <Text style={styles.title}>Changa publicada</Text>
         <Text style={styles.subtitle}>
-          Le avisamos a {pro.name.split(' ')[0]} y a otros profesionales cercanos. Te vamos a
+          Le avisamos a {primerNombre} y a otros profesionales cercanos. Te vamos a
           notificar apenas alguien confirme.
         </Text>
 
-        <TrackRow title="Publicada" subtitle="Hoy, 10:42" />
+        <TrackRow title="Publicada" subtitle="Recién" />
         <TrackRow
           title="Esperando confirmación"
-          subtitle={`${pro.name} está viendo tu pedido`}
+          subtitle={`${proNombre || 'El profesional'} está viendo tu pedido`}
         />
 
         <Pressable
           style={styles.chatLink}
-          onPress={() => navigation.navigate('Chat', { proId: pro.id })}
+          onPress={() => navigation.navigate('Chat', { proId, proNombre, changaId })}
         >
-          <Text style={styles.chatLinkText}>💬 Escribirle a {pro.name.split(' ')[0]}</Text>
+          <Text style={styles.chatLinkText}>💬 Escribirle a {primerNombre}</Text>
         </Pressable>
       </View>
     </SafeAreaView>

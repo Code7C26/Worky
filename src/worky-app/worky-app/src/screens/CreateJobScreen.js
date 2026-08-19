@@ -7,32 +7,57 @@ import {
   ScrollView,
   TextInput,
   Pressable,
+  ActivityIndicator,
 } from 'react-native';
 import { colors, fonts, radius } from '../theme/theme';
 import GradientButton from '../components/GradientButton';
-import { professionals } from '../data/mockData';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../api/client';
 
 const CATEGORIES = ['Gas', 'Plomería', 'Electricidad', 'Albañilería'];
 
 export default function CreateJobScreen({ route, navigation }) {
-  const { proId } = route.params;
-  const pro = professionals.find((p) => p.id === proId) ?? professionals[0];
+  const { proId, proNombre, proCategoria } = route.params;
+  const { token } = useAuth();
 
   // Los 3 campos obligatorios del endpoint POST /api/v1/trabajos:
   // ubicación, categoría y precio ofrecido. Si falta uno, no se publica.
-  const [location, setLocation] = useState('Av. Sarmiento 1240, Alta Gracia');
-  const [category, setCategory] = useState('Gas');
-  const [price, setPrice] = useState('15.000');
+  const [location, setLocation] = useState('');
+  const [category, setCategory] = useState(
+    CATEGORIES.includes(proCategoria) ? proCategoria : CATEGORIES[0]
+  );
+  const [price, setPrice] = useState('');
   const [detail, setDetail] = useState('');
   const [error, setError] = useState('');
+  const [enviando, setEnviando] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!location.trim() || !category || !price.trim()) {
       setError('Ubicación, categoría y precio ofrecido son obligatorios.');
       return;
     }
     setError('');
-    navigation.navigate('Confirmation', { proId: pro.id, category, price, location });
+    setEnviando(true);
+    try {
+      const changa = await api.crearChanga(
+        {
+          ubicacion: { direccionTexto: location.trim() },
+          categoria: category,
+          precioOfrecido: Number(price),
+          detalle: detail.trim(),
+        },
+        token
+      );
+      navigation.navigate('Confirmation', {
+        changaId: changa._id,
+        proId,
+        proNombre,
+      });
+    } catch (e) {
+      setError(e.message || 'No pudimos publicar la changa. Probá de nuevo.');
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -44,7 +69,7 @@ export default function CreateJobScreen({ route, navigation }) {
           </Pressable>
           <Text style={styles.title}>Solicitar changa</Text>
           <Text style={styles.subtitle}>
-            Completá los datos para que {pro.name.split(' ')[0]} reciba tu pedido
+            Completá los datos para que {proNombre?.split(' ')[0] || 'el profesional'} reciba tu pedido
           </Text>
         </View>
 
@@ -54,7 +79,8 @@ export default function CreateJobScreen({ route, navigation }) {
               value={location}
               onChangeText={setLocation}
               style={styles.input}
-              placeholder="Dirección"
+              placeholder="Ej: Av. Sarmiento 1240, Alta Gracia"
+              placeholderTextColor={colors.inkFaint}
             />
           </Field>
 
@@ -81,6 +107,8 @@ export default function CreateJobScreen({ route, navigation }) {
                 value={price}
                 onChangeText={setPrice}
                 keyboardType="numeric"
+                placeholder="15000"
+                placeholderTextColor={colors.inkFaint}
                 style={{ flex: 1, fontFamily: fonts.body, fontSize: 13, color: colors.ink }}
               />
             </View>
@@ -102,7 +130,11 @@ export default function CreateJobScreen({ route, navigation }) {
       </ScrollView>
 
       <View style={styles.cta}>
-        <GradientButton label="Publicar changa" onPress={handleSubmit} />
+        {enviando ? (
+          <ActivityIndicator color={colors.orange} />
+        ) : (
+          <GradientButton label="Publicar changa" onPress={handleSubmit} />
+        )}
       </View>
     </SafeAreaView>
   );

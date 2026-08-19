@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,33 +9,69 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { colors, fonts, radius } from '../theme/theme';
 import Avatar from '../components/Avatar';
-import { professionals, chatMessages } from '../data/mockData';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../api/client';
+import { getIniciales } from '../utils/mappers';
+
+const POLL_INTERVAL_MS = 4000; // cada cuánto revisamos si hay mensajes nuevos
+
+function mapMensaje(m, miUsuarioId) {
+  const emisorId = m.emisor?._id || m.emisor;
+  return {
+    id: m._id,
+    from: emisorId === miUsuarioId ? 'me' : 'them',
+    text: m.texto,
+    time: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  };
+}
 
 export default function ChatScreen({ route, navigation }) {
-  const { proId } = route.params;
-  const pro = professionals.find((p) => p.id === proId) ?? professionals[0];
+  const { proNombre, changaId } = route.params;
+  const { usuario, token } = useAuth();
 
-  const [messages, setMessages] = useState(chatMessages);
+  const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState('');
+  const [cargando, setCargando] = useState(true);
+  const [enviando, setEnviando] = useState(false);
   const listRef = useRef(null);
 
-  const handleSend = () => {
-    if (!draft.trim()) return;
-    const newMessage = {
-      id: `m${Date.now()}`,
-      from: 'me',
-      text: draft.trim(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-    setMessages((prev) => [...prev, newMessage]);
+  const cargarMensajes = useCallback(async () => {
+    try {
+      const data = await api.getMensajes(changaId, token);
+      setMessages(data.map((m) => mapMensaje(m, usuario.id)));
+    } catch (e) {
+      // Si falla un ciclo de polling no interrumpimos el chat, simplemente reintenta el próximo.
+    } finally {
+      setCargando(false);
+    }
+  }, [changaId, token, usuario.id]);
+
+  // Carga inicial + polling mientras la pantalla está montada
+  useEffect(() => {
+    cargarMensajes();
+    const interval = setInterval(cargarMensajes, POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [cargarMensajes]);
+
+  const handleSend = async () => {
+    const texto = draft.trim();
+    if (!texto || enviando) return;
+
     setDraft('');
-    // Acá es donde iría la llamada real: enviar a Firestore/WebSocket
-    // y dejar que la respuesta del profesional llegue por un listener,
-    // no simulada como en este mock.
-    requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
+    setEnviando(true);
+    try {
+      const nuevo = await api.enviarMensaje(changaId, texto, token);
+      setMessages((prev) => [...prev, mapMensaje(nuevo, usuario.id)]);
+      requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
+    } catch (e) {
+      setDraft(texto); // devolvemos el texto al input si falló, para no perder lo escrito
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -49,45 +85,57 @@ export default function ChatScreen({ route, navigation }) {
           <Pressable onPress={() => navigation.goBack()}>
             <Text style={styles.back}>←</Text>
           </Pressable>
-          <Avatar initials={pro.initials} size={38} />
+          <Avatar initials={getIniciales(proNombre)} size={38} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.cname}>{pro.name}</Text>
+            <Text style={styles.cname}>{proNombre}</Text>
             <View style={styles.statusRow}>
               <View style={styles.dot} />
-              <Text style={styles.cstatus}>En línea</Text>
+              <Text style={styles.cstatus}>Chat de la changa</Text>
             </View>
           </View>
         </View>
 
-        <FlatList
-          ref={listRef}
-          data={messages}
-          keyExtractor={(m) => m.id}
-          contentContainerStyle={styles.list}
-          ListHeaderComponent={
-            <View style={styles.orderCard}>
-              <View style={styles.orderPin}>
-                <Text style={{ fontSize: 15 }}>📍</Text>
-              </View>
-              <View>
-                <Text style={styles.orderTitle}>Changa: {pro.oficio}</Text>
-                <Text style={styles.orderSubtitle}>Con {pro.name}</Text>
-              </View>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <View style={[styles.bubbleRow, item.from === 'me' && styles.bubbleRowMe]}>
-              <View style={{ maxWidth: '78%' }}>
-                <View style={[styles.bubble, item.from === 'me' ? styles.bubbleMe : styles.bubbleThem]}>
-                  <Text style={item.from === 'me' ? styles.bubbleTextMe : styles.bubbleTextThem}>
-                    {item.text}
-                  </Text>
+        {cargando ? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <ActivityIndicator color={colors.orange} />
+          </View>
+        ) : (
+          <FlatList
+            ref={listRef}
+            data={messages}
+            keyExtractor={(m) => m.id}
+            contentContainerStyle={styles.list}
+            onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
+            ListHeaderComponent={
+              <View style={styles.orderCard}>
+                <View style={styles.orderPin}>
+                  <Text style={{ fontSize: 15 }}>📍</Text>
                 </View>
-                <Text style={[styles.time, item.from === 'me' && styles.timeMe]}>{item.time}</Text>
+                <View>
+                  <Text style={styles.orderTitle}>Chat de tu changa</Text>
+                  <Text style={styles.orderSubtitle}>Con {proNombre}</Text>
+                </View>
               </View>
-            </View>
-          )}
-        />
+            }
+            ListEmptyComponent={
+              <Text style={styles.emptyChat}>
+                Todavía no hay mensajes. Escribí el primero para coordinar con {proNombre?.split(' ')[0]}.
+              </Text>
+            }
+            renderItem={({ item }) => (
+              <View style={[styles.bubbleRow, item.from === 'me' && styles.bubbleRowMe]}>
+                <View style={{ maxWidth: '78%' }}>
+                  <View style={[styles.bubble, item.from === 'me' ? styles.bubbleMe : styles.bubbleThem]}>
+                    <Text style={item.from === 'me' ? styles.bubbleTextMe : styles.bubbleTextThem}>
+                      {item.text}
+                    </Text>
+                  </View>
+                  <Text style={[styles.time, item.from === 'me' && styles.timeMe]}>{item.time}</Text>
+                </View>
+              </View>
+            )}
+          />
+        )}
 
         <View style={styles.inputBar}>
           <TextInput
@@ -146,6 +194,15 @@ const styles = StyleSheet.create({
   },
   orderTitle: { fontFamily: fonts.bodySemi, fontSize: 11.5, color: colors.navyDeep },
   orderSubtitle: { fontFamily: fonts.body, fontSize: 10.5, color: colors.inkFaint, marginTop: 1 },
+  emptyChat: {
+    fontFamily: fonts.body,
+    fontSize: 12.5,
+    color: colors.inkFaint,
+    textAlign: 'center',
+    paddingHorizontal: 30,
+    marginTop: 20,
+    lineHeight: 18,
+  },
   bubbleRow: { flexDirection: 'row', marginBottom: 10 },
   bubbleRowMe: { justifyContent: 'flex-end' },
   bubble: { paddingHorizontal: 13, paddingVertical: 10, borderRadius: 16 },

@@ -37,8 +37,9 @@ export default function RegisterScreen({ route, navigation }) {
     setError('');
     setLoading(true);
     try {
-      await register({ nombre: nombre.trim(), email: email.trim(), password, rol });
-      navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+      const usuarioCreado = await register({ nombre: nombre.trim(), email: email.trim(), password, rol });
+      const destino = usuarioCreado.rol === 'profesional' ? 'ProfessionalHome' : 'Home';
+      navigation.reset({ index: 0, routes: [{ name: destino }] });
     } catch (e) {
       setError(e.message || 'No pudimos crear la cuenta.');
     } finally {

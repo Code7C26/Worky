@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/auth');
 const profesionalesRoutes = require('./routes/profesionales');
+const perfilProfesionalRoutes = require('./routes/perfilProfesional');
 const trabajosRoutes = require('./routes/trabajos');
 const chatsRoutes = require('./routes/chats');
 
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/profesionales', profesionalesRoutes);
+app.use('/api/v1/perfil-profesional', perfilProfesionalRoutes);
 app.use('/api/v1/trabajos', trabajosRoutes);
 app.use('/api/v1/chats', chatsRoutes);
 

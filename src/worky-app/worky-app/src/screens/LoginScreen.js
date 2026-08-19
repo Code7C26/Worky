@@ -31,8 +31,9 @@ export default function LoginScreen({ route, navigation }) {
     setError('');
     setLoading(true);
     try {
-      await login(email.trim(), password);
-      navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+      const usuarioLogueado = await login(email.trim(), password);
+      const destino = usuarioLogueado.rol === 'profesional' ? 'ProfessionalHome' : 'Home';
+      navigation.reset({ index: 0, routes: [{ name: destino }] });
     } catch (e) {
       setError(e.message || 'No pudimos iniciar sesión.');
     } finally {

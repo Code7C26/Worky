@@ -39,8 +39,14 @@ export const api = {
     return request(`/profesionales${query ? `?${query}` : ''}`);
   },
   getProfesional: (id) => request(`/profesionales/${id}`),
+  getMiPerfilProfesional: (token) => request('/perfil-profesional/mio', { token }),
+  guardarMiPerfilProfesional: (payload, token) =>
+    request('/perfil-profesional/mio', { method: 'PUT', body: payload, token }),
   crearChanga: (payload, token) =>
     request('/trabajos', { method: 'POST', body: payload, token }),
+  getChangasDisponibles: (token) => request('/trabajos/disponibles', { token }),
+  getMisChangasAsignadas: (token) => request('/trabajos/asignadas', { token }),
+  aceptarChanga: (id, token) => request(`/trabajos/${id}/aceptar`, { method: 'PATCH', token }),
   getMensajes: (changaId, token) => request(`/chats/${changaId}/mensajes`, { token }),
   enviarMensaje: (changaId, texto, token) =>
     request(`/chats/${changaId}/mensajes`, { method: 'POST', body: { texto }, token }),

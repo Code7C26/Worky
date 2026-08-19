@@ -15,8 +15,8 @@ export default function ProCard({ pro, onPress }) {
         </View>
         <Text style={styles.oficio}>{pro.oficio}</Text>
         <View style={styles.metaRow}>
-          <Text style={styles.stars}>★ {pro.rating}</Text>
-          <Text style={styles.metaDim}>· {pro.distanceKm} km</Text>
+          <Text style={styles.stars}>★ {pro.rating.toFixed(1)}</Text>
+          {pro.distanceKm != null && <Text style={styles.metaDim}>· {pro.distanceKm} km</Text>}
           <Text style={styles.metaDim}>· {pro.availability}</Text>
         </View>
       </View>

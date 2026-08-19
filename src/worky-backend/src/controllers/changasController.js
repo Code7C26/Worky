@@ -1,4 +1,5 @@
 const Changa = require('../models/Changa');
+const PerfilProfesional = require('../models/PerfilProfesional');
 
 // POST /api/v1/trabajos
 // La documentación del proyecto dice: ubicación, categoría y precio ofrecido
@@ -66,4 +67,68 @@ async function misChangas(req, res) {
   }
 }
 
-module.exports = { crear, detalle, misChangas };
+// GET /api/v1/trabajos/disponibles
+// Le muestra al profesional logueado las changas publicadas de SU categoría, sin asignar todavía.
+async function disponibles(req, res) {
+  try {
+    const miPerfil = await PerfilProfesional.findOne({ usuario: req.usuarioId });
+
+    if (!miPerfil) {
+      return res.status(400).json({
+        error: 'Todavía no cargaste tu perfil profesional (categoría, precio, etc.). Completalo primero.',
+      });
+    }
+
+    const changas = await Changa.find({
+      categoria: miPerfil.categoria,
+      estado: 'publicada',
+    })
+      .populate('cliente', 'nombre')
+      .sort({ createdAt: -1 });
+
+    return res.json(changas);
+  } catch (err) {
+    return res.status(500).json({ error: 'Error al buscar changas disponibles.', detalle: err.message });
+  }
+}
+
+// PATCH /api/v1/trabajos/:id/aceptar
+async function aceptar(req, res) {
+  try {
+    const changa = await Changa.findById(req.params.id);
+
+    if (!changa) {
+      return res.status(404).json({ error: 'Changa no encontrada.' });
+    }
+    if (changa.estado !== 'publicada') {
+      return res.status(409).json({ error: 'Esta changa ya fue tomada por otro profesional.' });
+    }
+
+    changa.profesional = req.usuarioId;
+    changa.estado = 'aceptada';
+    await changa.save();
+
+    const changaConCliente = await changa.populate('cliente', 'nombre');
+    return res.json(changaConCliente);
+  } catch (err) {
+    return res.status(500).json({ error: 'Error al aceptar la changa.', detalle: err.message });
+  }
+}
+
+// GET /api/v1/trabajos/asignadas — changas que este profesional ya aceptó (para entrar a chatear)
+async function misAsignadas(req, res) {
+  try {
+    const changas = await Changa.find({
+      profesional: req.usuarioId,
+      estado: { $in: ['aceptada', 'en_curso'] },
+    })
+      .populate('cliente', 'nombre')
+      .sort({ createdAt: -1 });
+
+    return res.json(changas);
+  } catch (err) {
+    return res.status(500).json({ error: 'Error al buscar tus changas asignadas.', detalle: err.message });
+  }
+}
+
+module.exports = { crear, detalle, misChangas, disponibles, aceptar, misAsignadas };

@@ -26,6 +26,7 @@ const usuarioSchema = new mongoose.Schema(
       direccionTexto: { type: String },
     },
     activo: { type: Boolean, default: true },
+    expoPushToken: { type: String }, // token de notificaciones push del dispositivo
   },
   { timestamps: true } // agrega createdAt / updatedAt automáticamente
 );
